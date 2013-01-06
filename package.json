@@ -1,5 +1,5 @@
 {
-  "name": "Gaikan",
+  "name": "gaikan",
   "version": "1.0.0",
   "description": "HTML template engine for Node and Express.",
   "main": "index.js",
