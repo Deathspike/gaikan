@@ -105,7 +105,7 @@ Gaikan.prototype.compile = function (template) {
 	// Initialize a new instance of the Parser class.
 	var parser = new Parser(writer);
 	// Compile the template and create a function.
-	return new Function('e', 'v0', 'ip', parser.compile(template));
+	return /*jslint evil: true*/ new Function('e', 'v0', 'ip', parser.compile(template));
 };
 
 /**
