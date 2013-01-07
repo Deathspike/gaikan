@@ -51,7 +51,7 @@ Gaikan.prototype.build = function (directories) {
 		// Retrieve the statistics for the file path.
 		var stats = fs.statSync(filePath);
 		// Check if this is a file and check if it contains the extension.
-		if (stats.isFile() && filepath.split('.').pop() == this.options.extension) {
+		if (stats.isFile() && filePath.split('.').pop() == this.options.extension) {
 			// Initialize a new instance of the Writer class.
 			var writer = new Writer();
 			// Initialize a new instance of the Parser class.
