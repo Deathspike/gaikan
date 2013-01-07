@@ -1,9 +1,9 @@
 // Include the engine.
 var Engine = require('./lib/engine');
 // Include the file system module.
-var FS = require('fs');
+var fs = require('fs');
 // Include the path module.
-var Path = require('path');
+var path = require('path');
 // Include the parser.
 var Parser = require('./lib/parser');
 // Include the writer.
@@ -18,11 +18,11 @@ function Gaikan() {
 	// Initialize a new instance of the Engine class.
 	this.engine = new Engine(this);
 	// Initialize the options.
-	this.options = {cache: true, directory: 'views', extension: 'html'};
+	this.options = { cache: true, directory: 'views', extension: 'html' };
 	// Initialize the templates.
 	this.templates = {};
 	// Initialize the parent directory.
-	this.parentDirectory = Path.dirname(module.parent.filename);
+	this.parentDirectory = path.dirname(module.parent.filename);
 }
 
 /**
@@ -32,13 +32,13 @@ function Gaikan() {
  * @param directories The directories in which the builder currently resides.
  * @return The compiled template.
  */
-Gaikan.prototype.build = function(directories) {
+Gaikan.prototype.build = function (directories) {
 	// Initialize the directory path.
 	var directoryPath = this.options.directory + (directories === undefined ? '' : '/' + directories.join('/'));
 	// Initialize the response.
 	var response = [];
 	// Retrieve the files and directories.
-	var files = FS.readdirSync(directoryPath);
+	var files = fs.readdirSync(directoryPath);
 	// Check if the directories array is undefined.
 	if (directories === undefined) {
 		// Initialize the directories array.
@@ -49,9 +49,9 @@ Gaikan.prototype.build = function(directories) {
 		// Retrieve the file path.
 		var filePath = directoryPath + '/' + files[i];
 		// Retrieve the statistics for the file path.
-		var stats = FS.statSync(filePath);
+		var stats = fs.statSync(filePath);
 		// Check if this is a file and check if it contains the extension.
-		if (stats.isFile() && filePath.split('.').pop() == this.options.extension) {
+		if (stats.isFile() && filepath.split('.').pop() == this.options.extension) {
 			// Initialize a new instance of the Writer class.
 			var writer = new Writer();
 			// Initialize a new instance of the Parser class.
@@ -63,7 +63,7 @@ Gaikan.prototype.build = function(directories) {
 			// Push the template registration.
 			response.push('gaikan.templates[\'' + ((directories.length === 0 ? '' : directories.join('/') + '/') + pieces.join('')).replace('\'', '\\\'') + '\']=function(e,v0,ip){');
 			// Compile the template and push it to the build response.
-			response.push(parser.compile(FS.readFileSync(filePath, 'utf8')));
+			response.push(parser.compile(fs.readFileSync(filePath, 'utf8')));
 			// Push the 
 			response.push('};');
 		}
@@ -87,9 +87,9 @@ Gaikan.prototype.build = function(directories) {
  * @throws Throws an exception when a path or template is invalid.
  * @param path The path to the build templates file.
  */
-Gaikan.prototype.buildToPath = function(path) {
+Gaikan.prototype.buildToPath = function (path) {
 	// Build all templates and write to the path.
-	FS.writeFileSync(path, this.build(), 'utf8');
+	fs.writeFileSync(path, this.build(), 'utf8');
 };
 
 /**
@@ -105,7 +105,7 @@ Gaikan.prototype.compile = function (template) {
 	// Initialize a new instance of the Parser class.
 	var parser = new Parser(writer);
 	// Compile the template and create a function.
-	return /*jslint evil: true*/ new Function('e', 'v0', 'ip', parser.compile(template));
+	return new Function('e', 'v0', 'ip', parser.compile(template));
 };
 
 /**
@@ -115,7 +115,7 @@ Gaikan.prototype.compile = function (template) {
  * @param path The path to the template.
  * @return The compiled template.
  */
-Gaikan.prototype.compileFromPath = function(path) {
+Gaikan.prototype.compileFromPath = function (path) {
 	// Split the path to retrieve the file name.
 	var fileName = path.split(/(\|\/)/).pop();
 	// Split the file name to retrieve the file extension.
@@ -142,13 +142,13 @@ Gaikan.prototype.compileFromPath = function(path) {
 		// Check if the template has not been cached.
 		if (!(path in this.templates)) {
 			// Compile and cache the template.
-			this.templates[path] = this.compile(FS.readFileSync(path, 'utf8'));
+			this.templates[path] = this.compile(fs.readFileSync(path, 'utf8'));
 		}
 		// Return the compiled template.
 		return this.templates[path];
 	}
 	// Otherwise compile and return the template.
-	else return this.compile(FS.readFileSync(path, 'utf8'));
+	else return this.compile(fs.readFileSync(path, 'utf8'));
 };
 
 /**
@@ -159,7 +159,7 @@ Gaikan.prototype.compileFromPath = function(path) {
  * @param values The values to use when rendering.
  * @return The rendered template.
  */
-Gaikan.prototype.render = function(template, values) {
+Gaikan.prototype.render = function (template, values) {
 	// Compile the template and invoke it using a the current engine.
 	return this.compile(template)(this.engine, values);
 };
@@ -172,7 +172,7 @@ Gaikan.prototype.render = function(template, values) {
  * @param values The values to use when rendering.
  * @return The rendered template.
  */
-Gaikan.prototype.renderFromPath = function(path, values) {
+Gaikan.prototype.renderFromPath = function (path, values) {
 	// Compile the template from the path and invoke it using a the current engine.
 	return this.compileFromPath(path)(this.engine, values);
 };
@@ -182,7 +182,7 @@ if (typeof module !== undefined) {
 	// Initialize a new instance of the Gaikan class and export it.
 	module.exports = new Gaikan();
 	// Add a function to the Gaikan class instance to support express view engines.
-	module.exports.__express = function(path, options, fn) {
+	module.exports.__express = function (path, options, fn) {
 		// Retrieve the current cache option as previous cache.
 		var previousCache = module.exports.options.cache;
 		// Check if the options variable is a function.
@@ -210,7 +210,7 @@ if (typeof module !== undefined) {
 			fn(null, rendered);
 		}
 		// Catch an error.
-		catch(err) {
+		catch (err) {
 			// Restore the previous cache option.
 			module.exports.options.cache = previousCache;
 			// Send the error.
