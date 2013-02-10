@@ -15,6 +15,13 @@ var Writer = require('./lib/writer');
  * directory and the default file extension.
  */
 function Gaikan() {
+	// Retrieve the parent.
+	var parent = module.parent;
+	// While the parent is valid.
+	while(parent.parent) {
+		// Set the parent.
+		parent = parent.parent;
+	}
 	// Initialize a new instance of the Engine class.
 	this.engine = new Engine(this);
 	// Initialize the options.
@@ -22,7 +29,7 @@ function Gaikan() {
 	// Initialize the templates.
 	this.templates = {};
 	// Initialize the parent directory.
-	this.parentDirectory = path.dirname(module.parent.filename);
+	this.parentDirectory = path.dirname(parent.filename);
 }
 
 /**
