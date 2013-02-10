@@ -145,4 +145,4 @@ Or you can use multiple handlers to change the variable.
 
 	Hello <a href="/users/#{name|title,url}/">#{name|title}</a>, welcome back!
 	
-The default handlers are *escape*, *lower*, *title*, *url* and *upper*. 
+The default handlers are *escape*, *lower*, *nl2br*, *title*, *url* and *upper*. 
