@@ -18,7 +18,7 @@ function Gaikan() {
 	// Retrieve the parent.
 	var parent = module.parent;
 	// While the parent is valid.
-	while(parent.parent) {
+	while (parent.parent) {
 		// Set the parent.
 		parent = parent.parent;
 	}
@@ -52,13 +52,13 @@ Gaikan.prototype.build = function (directories) {
 		directories = [];
 	}
 	// Iterate through each file and directory.
-	for (var i = 0; i < files.length; i++) {
+	for (var i = 0; i < files.length; i += 1) {
 		// Retrieve the file path.
 		var filePath = directoryPath + '/' + files[i];
 		// Retrieve the statistics for the file path.
 		var stats = fs.statSync(filePath);
 		// Check if this is a file and check if it contains the extension.
-		if (stats.isFile() && filePath.split('.').pop() == this.options.extension) {
+		if (stats.isFile() && filePath.split('.').pop() === this.options.extension) {
 			// Initialize a new instance of the Writer class.
 			var writer = new Writer();
 			// Initialize a new instance of the Parser class.
@@ -112,7 +112,7 @@ Gaikan.prototype.compile = function (template) {
 	// Initialize a new instance of the Parser class.
 	var parser = new Parser(writer);
 	// Compile the template and create a function.
-	return /*jslint evil: true*/ new Function('e', 'v0', 'ip', parser.compile(template));
+	return new Function('e', 'v0', 'ip', parser.compile(template));
 };
 
 /**
@@ -193,7 +193,7 @@ if (typeof module !== undefined) {
 		// Retrieve the current cache option as previous cache.
 		var previousCache = module.exports.options.cache;
 		// Check if the options variable is a function.
-		if (typeof options == 'function') {
+		if (typeof options === 'function') {
 			// Set the callback to the options.
 			fn = options;
 			// Initialize the options.
