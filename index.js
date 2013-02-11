@@ -25,7 +25,7 @@ function Gaikan() {
 	// Initialize a new instance of the Engine class.
 	this.engine = new Engine(this);
 	// Initialize the options.
-	this.options = { cache: true, directory: 'views', extension: 'html' };
+	this.options = { cache: true, directory: 'views', extension: 'html', layout: null };
 	// Initialize the templates.
 	this.templates = {};
 	// Initialize the parent directory.
@@ -167,6 +167,14 @@ Gaikan.prototype.compileFromPath = function (path) {
  * @return The rendered template.
  */
 Gaikan.prototype.render = function (template, values) {
+	// Check if a layout has been configured.
+	if (this.options.layout) {
+		// Compile the template from the path and invoke it with a partial.
+		return this.compile(this.options.layout)(this.engine, values, {
+			// Define the content partial as the requested path.
+			content: this.compileFromPath(path)
+		});
+	}
 	// Compile the template and invoke it using a the current engine.
 	return this.compile(template)(this.engine, values);
 };
@@ -180,6 +188,14 @@ Gaikan.prototype.render = function (template, values) {
  * @return The rendered template.
  */
 Gaikan.prototype.renderFromPath = function (path, values) {
+	// Check if a layout has been configured.
+	if (this.options.layout) {
+		// Compile the template from the path and invoke it with a partial.
+		return this.compileFromPath(this.options.layout)(this.engine, values, {
+			// Define the content partial as the requested path.
+			content: this.compileFromPath(path)
+		});
+	}
 	// Compile the template from the path and invoke it using a the current engine.
 	return this.compileFromPath(path)(this.engine, values);
 };
