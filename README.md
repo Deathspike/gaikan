@@ -39,6 +39,7 @@ Several configuration options are available in Gaikan.options.
 	* cache: Indicates whether compiled templates are cached (Default: true).
 	* directory: The direction from which templates are searched (Default: views).
 	* extension: The default extension of a template (Default: html).
+	* layout: The layout used for each render, containing a 'content' partial (Default: null).
 	
 ## Express
 
@@ -51,7 +52,7 @@ Gaikan can be plugged into Express quite easily.
 
 The configuration has now changed behaviour.
 	
-	* cache: Ignored. This is now controlled by Express.
+	* cache: Ignored.
 	* directory: Must match the directory specified by Express.
 	* extension: Ignored, except when using build or buildToPath methods.
 
@@ -67,10 +68,6 @@ A home template is going to be rendered into a master template.
 		<ins data-partial="content">
 			Hello world!
 		</ins>
-		<!-- This data-partial tells the master template we have a copy partial defined -->
-		<ins data-partial="copy">
-			Roel van Uden
-		</ins>
 	</ins>
 	
 Since I am including a master template, I need to make sure it is available.
@@ -82,7 +79,6 @@ Since I am including a master template, I need to make sure it is available.
 		<body>
 			<!-- This data-partial can be filled with content that is provided as a partial when including -->
 			<div id="container" data-partial="content"></div>
-			<div id="copy">(C) <ins data-partial="copy" /></div>
 		</body>
 	</html>
 	
@@ -100,7 +96,14 @@ When I render the home template, the following is generated.
 		</body>
 	</html>
 
-The result is obvious. Please do note that using *ins* ensures that element is omitted.
+The *ins* element is removed. Writing master include statements is tedious and is simplified.
+
+	// Include Gaikan.
+	var Gaikan = require('gaikan');
+	// Set the layout.
+	Gaikan.options.layout = 'master';
+
+The same behaviour is now applied to all templates.
 
 ### Iterators/conditions
 
