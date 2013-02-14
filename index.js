@@ -4,8 +4,8 @@ var Engine = require('./lib/engine');
 var fs = require('fs');
 // Include the path module.
 var path = require('path');
-// Include the parser.
-var Parser = require('./lib/parser');
+// Include the compiler.
+var compiler = require('./lib/compiler');
 // Include the writer.
 var Writer = require('./lib/writer');
 
@@ -25,7 +25,7 @@ function Gaikan() {
 	// Initialize a new instance of the Engine class.
 	this.engine = new Engine(this);
 	// Initialize the options.
-	this.options = { cache: true, directory: 'views', extension: 'html', layout: null };
+	this.options = { cache: process.env.NODE_ENV === 'production', directory: 'views', extension: 'html', layout: null };
 	// Initialize the templates.
 	this.templates = {};
 	// Initialize the parent directory.
@@ -61,8 +61,6 @@ Gaikan.prototype.build = function (directories) {
 		if (stats.isFile() && filePath.split('.').pop() === this.options.extension) {
 			// Initialize a new instance of the Writer class.
 			var writer = new Writer();
-			// Initialize a new instance of the Parser class.
-			var parser = new Parser(writer);
 			// Split the file to prepare for the removal of the extension.
 			var pieces = files[i].split('.');
 			// Remove the extension.
@@ -70,7 +68,7 @@ Gaikan.prototype.build = function (directories) {
 			// Push the template registration.
 			response.push('gaikan.templates[\'' + ((directories.length === 0 ? '' : directories.join('/') + '/') + pieces.join('')).replace('\'', '\\\'') + '\']=function(e,v0,ip){');
 			// Compile the template and push it to the build response.
-			response.push(parser.compile(fs.readFileSync(filePath, 'utf8')));
+			response.push(compiler(fs.readFileSync(filePath, 'utf8')));
 			// Push the 
 			response.push('};');
 		}
@@ -107,12 +105,8 @@ Gaikan.prototype.buildToPath = function (path) {
  * @return The compiled template.
  */
 Gaikan.prototype.compile = function (template) {
-	// Initialize a new instance of the Writer class.
-	var writer = new Writer();
-	// Initialize a new instance of the Parser class.
-	var parser = new Parser(writer);
 	// Compile the template and create a function.
-	return new Function('e', 'v0', 'ip', parser.compile(template));
+	return new Function('e', 'v0', 'ip', compiler(template));
 };
 
 /**
