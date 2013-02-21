@@ -1,249 +1,333 @@
-# Gaikan
+# Gaikan (1.3)
 
-HTML template engine for Node and Express.
+Gaikan is a HTML template engine for Node and Express. It allows compilation of HTML to JavaScript and provides a HTML-valid syntax to enable usage of conditions, iterators, includes, partials and variables. The template module was written to have a low entry barrier while accommodating any templating need with the highest achievable performance.
 
+<a name="a1" />
 ## Installation
 
 	$ npm install gaikan
 
+<a name="a2"/>
 ## Features
 
-	* Compiles templates to JavaScript supporting node and browsers.
-	* Complies with W3C standards.
-	* Complies with the [Express](http://expressjs.com) view system.
-	* Designer friendly; existing tooling will work with Gaikan.
-	* Quick entry; Gaikan is easy! It is just HTML and JavaScript.
-	* Includes/partials; share markup between views.
-	* Iterators/conditions; iterate, filter and write conditions.
-	* Variables/handlers; use (conditional) variables and handlers.
+	- Compiles HTML to JavaScript; low entry barrier.
+	- Complies with W3C standards; designer friendly.
+	- Complies with the Express view system.
+	- Includes/partials; share markup between views.
+	- Iterators/conditions; iterate, filter and write conditions.
+	- Variables/handlers; use (conditional) variables and handlers.
 	
-## Planned Features
-
-	* Client-side component using client-side rendering.
-	* Express component to transparently enable client-side rendering support.
-
+<a name="a3"/>
 ## API
 
-The API is minimal.
+Direct usage of the API is not required when using [Express](#a4). The following API is available:
 
-	* build: Build all templates.
-	* buildToPath(path): Build all templates into a file.
-	* compile(template): Compile a template.
-	* compileFromPath(path): Compile a template from a path.
-	* render(template, values): Render a template.
-	* renderFromPath(path, values): Render a template from a path.
+	compile(template)
+	    Compiles a template.
+	compileFile(file, directory, cache)
+	    Compiles a template from file.
+	render(root, inputPartials, template)
+	    Render a template.
+	renderFile(root, inputPartials, file, directory, cache)
+	    Render a template from file.
 
-## Configuration
-
-Several configuration options are available in Gaikan.options.
-
-	* cache: Indicates whether compiled templates are cached (Default: True when NODE_ENV is production).
-	* directory: The direction from which templates are searched (Default: views).
-	* extension: The default extension of a template (Default: html).
-	* layout: The layout used for all rendering, containing a 'content' partial (Default: null).
-	
+<a name="a4"/>
 ## Express
 
-Gaikan is easy to use with Express.
+Support for Express has been made as painless as possible. Include the module:
 
-	// Include the Gaikan module.
-	var Gaikan = require('Gaikan');
-	// Set the Gaikan view engine.
-	app.engine('html', Gaikan.__express);
-	// Set the view engine extension.
+	var gaikan = require('gaikan').
+
+Configure the view engine:
+
+	app.engine('html', gaikan);
+	
+Set the view engine extension:
+
 	app.set('view engine', 'html');
 
+<a name="a5"/>
+## Options
 
-## Templates
+The following options are available:
 
-### Includes/partials
+	cache     : Indicates whether templates compiled from file are cached.
+	compress  : Indicates whether templates compiled from file are cached.
+	directory : The default directory, or directories, used when compiling a template from file.
+	extension : The default file extension used when compiling a template from file.
+	layout    : The layout applied on templates rendered from file.
+	partial   : The name of the partial used when applying the layout.
+	scoped    : Indicates whether Express rendering is scoped to locals and options as partial.
 
-A home template is going to be rendered into a layout template.
+The latter three options are handled in depth at [layouts](#a11) and [scoping](#a12).
 
-	<ins data-include="layout">
-		<ins data-partial="content">
-			Hello world!
-		</ins>
-	</ins>
+<a name="a6"/>
+## Attributes
+
+The syntax uses **data-*** attributes for control flow features.
+
+<a name="a7"/>
+### Conditions
+
+A condition is an if-statement on a HTML element using **data-if**. Use the following template:
+
+	<div data-if="data.name">Name is set!</div>
 	
-Since I am including a layout template, I need to make sure it is available.
+The **data.name** indicates it uses the current data object with the name property. This is the following in JavaScript:
 
-	<html>
-		<head>
-			<title>Hello world!</title>
-		</head>
-		<body>
-			<div id="container" data-partial="content"></div>
-		</body>
-	</html>
+	result += '<div>;
+	if (data.name) result += 'Name is set!';
+	result += '</div>';
 	
-When I render the home template, the following is generated.
+When not using Express, this is how it would be rendered:
 
-	<html>
-		<head>
-			<title>Hello world!</title>
-		</head>
-		<body>
-			<div id="container">
-				Hello world!
-			</div>
-		</body>
-	</html>
+	gaikan.renderFile({name: 'Deathspike'}, null, 'template');
 
-The *ins* element is removed. Writing layout include statements can be omitted by setting a layout.
+The second argument is for [partials](#a10), so use null. The result is the following:
 
-	// Set the layout.
-	Gaikan.options.layout = 'master';
-
-Similar behaviour is now applied to all templates without includes.
-
-### Variables/handlers
-
-Variables are used add dynamic content to the view.
-
-	Hello #{name}, welcome back!
+	<div>Name is set!</div>
 	
-A variable can appear as non-escaped HTML, which uses an exclamation mark.
+Conditions are JavaScript, so valid JavaScript is valid here. What if the name is undefined? The result is the following:
 
-	Hello !{name}, welcome back!
+	<div></div>
 	
-It is also possible to add a handler to change the variable.
+The empty **div** element is there because it was declared. We can use the special element, **ins**, like this:
 
-	Hello #{name|title}, welcome back!
+	<ins data-if="data.name">Name is set!</ins>
+
+Using the **data-*** attributes, the **ins** element is interpreted as obsolete. This would result in:
+
+	Name is set!
 	
-Or you can use multiple handlers to change the variable.
+The special **ins** element is often useful for [includes](#a9).
 
-	Hello <a href="/users/#{name|title,url}/">#{name|title}</a>, welcome back!
-	
-### Iterators/conditions
+<a name="a8"/>
+### Iterators
 
-These examples use the following object for the view.
-
-	{users: [{name: 'Foo'}, {name: 'Bar'}, {name: ''}]}
-
-Iterators allow you to repeat content for each item using the data-each attribute.
-	
-	<ul data-each="data.users">
-		<li>#{data.name}</li>
-	</ul>
-
-The result is not perfect.
-
-	<ul>
-		<li>Foo</li>
-		<li>Bar</li>
-		<li></li>
-	</ul>
-
-One of the names is not valid. You can use a simple condition to remove it.
+An iterator is a for-statement on a HTML element using **data-each**. Use the following template:
 
 	<ul data-each="data.users">
-		<li data-if="data.name.length">#{name}</li>
-	</ul>
-
-The result now has the invalid name removed.
-
-	<ul>
-		<li>Foo</li>
-		<li>Bar</li>
+		<li>Someone is here.</li>
 	</ul>
 	
-This is better, but we want the names to be sorted alphabetically.
+This is the following in JavaScript:
 
-	<ul data-each="filters.sort(data.users, 'name')">
-		<li data-if="data.name.length">#{name}</li>
-	</ul>
+	result += '<ul>';
+	for (var key in data.users) {
+		if (data.users.hasOwnProperty(key)) {
+			result += '<li>Someone is here.</li>';
+		}
+	}
+	result += '</ul>';
+
+When not using Express, this is how it would be rendered:
+
+	gaikan.renderFile({users: ['Deathspike']}, null, 'template');
+
+The result is the following:
+
+	<ul><li>Someone is here.</li></ul>
+
+This becomes powerful when used together with [variables](#a13).
+
+<a name="a9"/>
+### Includes
+
+Including allows a template to use another template using **data-include**. The following is **hello.html**:
+
+	<b>Hello world!</b>
 	
-The result is actually much better.
+To demonstrate an inclusion, the following is **layout.html**:
 
-	<ul>
-		<li>Bar</li>
-		<li>Foo</li>
-	</ul>
+	<div class="container" data-include="hello"></div>
 	
-Conditions and iterators are just JavaScript. This is both familiar and powerful.
+When rendering **layout.html**, the output is as followed:
 
-## Scoping
+	<div class="container"><b>Hello world!</b></div>
 
-The scope changes when iterating and when using partials. The following fields are defined.
+The contents of **hello.html** are where they are supposed to be.
 
-	* data: The active data. This changes when iterating and possibly when using partials.
-	* key: The iteration key. This is set when iterating to the index of property name.
-	* root: The root data. This is the input data provided to the template at all times.
-	* parent: The parent data. The parent is defined when iterating.
+<a name="a10"/>
+### Partials
+
+Partials can be used to define and insert content using **data-partial**. The following is **hello.html**:
+
+	<b><ins data-partial="content" /></b>
 	
-As seen in the iterator examples, data is scoped to the active data. The following object is used.
+A placeholder has been defined. When including this file, it can be filled. The following is **layout.html**:
 
-	{count: 3, users: ['Foo', 'Bar']}
+	<div class="container" data-include="hello">
+	    <ins data-partial="content">
+	        Hello world!
+	    </ins>
+	</div>
 
-Now you could want to use a (n/total) notation. Use the following view.
+When rendering **layout.html**, the output is as followed:
+
+	<div class="container"><b>Hello world!</b></div>
+
+The result is similar, but note that **Hello world!** was defined in **layout.html** instead of **hello.html**.
+
+<a name="a11"/>
+### Layout
+
+Includes and partials can be used to create a layout, but options make it easier. The following is **layout.html**:
+
+	<div class="container" data-partial="content"></div>
+	
+The partial placeholder is named content, matching *options.partial*. The following is **hello.html**:
+
+	<b>Hello world!</b>
+	
+There are no includes, instead we set *options.layout* to **'layout'**. The output is as followed:
+
+	<div class="container"><b>Hello world!</b></div>
+
+The **layout** options is very powerful, yet uses standard includes/partials to implement the feature.
+
+<a name="a12"/>
+### Scoping
+
+Have you been wondering about what **data** really is? It changes depending on the scope. Use the following:
 
 	<ul data-each="data.users">
-		<li>#{data} (#{key + 1}/#{parent.count})</li>
+		<li data-if="data">Someone is here.</li>
 	</ul>
 
-Note that the key was actually changed with some JavaScript! This gives the following result.
+The condition is using the value from the **data.users** iteration. This is the following in JavaScript:
 
-	<ul>
-		<li>Foo (1/2)</li>
-		<li>Bar (2/2)</li>
-	</ul>
+	result += '<ul>';
+	for (var key in data.users) {
+		if (data.users.hasOwnProperty(key)) {
+			(function (parent, data) {
+				result += '<li>Someone is here.</li>';
+			})(data, data.users[key]);
+		}
+	}
+	result += '</ul>';
+
+The contents of the iteration have been scoped. You can define scoping for **includes** or **partials** as followed:
+
+	<div data-include="hello|data.contents">
 	
-Again, this is all HTML and JavaScript. You could conditionally assign a class for highlighting purposes.
+Which can be interpreted as the following JavaScript:
 
-	<ul data-each="data.users">
-		<li class="#{key % 2 == 1 ? 'highlight' : ''}">
-			#{data} (#{key + 1}/#{parent.count})
-		</li>
-	</ul>
+	(function (data) {
+		magicalGaikanInclude(data, 'hello'); // FYI, this function was made up.
+	})(data.contents);
+
+Scoping enables **key** (in iterations), **parent** (in iterations) and **root**. [Express](#a4) can be scoped as well:
+
+	res.locals.value = 'Something';
+	res.render('template', {value: 42});
 	
-Which would result in the following.
+The **locals** can be set anywhere, which is what we want for the **layout**. The following is desired:
 
-	<ul>
-		<li class="">Foo (1/2)</li>
-		<li class="highlight">Bar (2/2)</li>
-	</ul>
+	{value: 'Something', content: {value: 42}}
 	
-Partials and includes use the active data as their scope. You can change this behaviour like this.
+And can be achieved by enabling *options.scoped*. Remind yourself to adjust the scoping of the content partial as well.
 
-	<div data-include="player|parent"></div>
+<a name="a13"/>
+## Variables
+
+Variables are defined as either *#{x}* or *!{x}* and are used for content insertion. Use the following:
+
+	<b>#{data.name}</b>
 	
-Which changes the included template to use the parent instead of data as scope.
+This is the following in JavaScript:
 
-## Handlers
+	result += '<b>';
+	result += handlers.escape(data.name);
+	result += '</b>';
 
-Each handler is a field in the handlers object. The following handlers are available.
+Something strange appeared, *handlers.escape*. That is because a **#** variable is **escaped**. Use the following:
 
-	* html: Escapes html to avoid html injection. Default behaviour when using #{var} instead of !{var}.
+	<b>!{data.name}</b>
+
+Since is the **unescaped** variable, this is the following in JavaScript:
+
+	result += '<b>';
+	result += data.name;
+	result += '</b>';
+
+An unescaped variable does allow HTML and is often undesirable. Variables can also use handlers as followed:
+
+	#{data|lower}
+	
+This would change the variable to lower-case prior to escaping it. Handlers can be chained as followed:
+
+	#{data|lower,upper}
+	
+Which would use both handlers. More information about handlers [can be found here](#a15).
+
+<a name="a14"/>
+### Performance
+
+About 95% of performance loss is due to escaping. A solution is to pre-save escape content:
+
+	var escape = require('gaikan/lib/handlers/escape-handler');
+	var value = escape('<p>This is escaped</p>');
+	
+This value would result into the following escaped text for storage purposes:
+
+	&#60;p&#62;This is escaped&#60;/p&#62;
+
+This improves performance as escaping is done once, opposed to every render. The following can be used now:
+
+	<b>!{data.content}</b>
+
+However, it is possible that the variable is to be changed. It can be unescaped using a handler as followed:
+
+	<textarea>!{data.content|unescape}</textarea>
+	
+Forgetting to escape a value makes you vulnerable to XSS. A different approach is presented in [a love story](#a16).
+
+<a name="a15"/>
+## Filters and Handlers
+
+Handlers have been explained in [variables](#a13), however the following is also possible:
+
+	<div data-if="handlers.upper(data.value)[0]"></div>
+
+This is because each handler is a field in the handlers object. The following handlers are available:
+
+	* escape: Escapes html to avoid html injection. Default behaviour when using #{var} instead of !{var}.
 	* lower: Changes the value to lower case.
 	* nl2br: Changes new lines to break elements. Great when using !{var|nl2br,escape} for text inputs.
 	* title: Changes the value to title case.
+	* unescape: Unescapes escaped html.
 	* upper: Changes the value to upper case.
 	* url: Escapes the value for use in an url.
-
-An example escaping an url.
-
-	<a href="#{data.address|url}">Go there now!</a>
-
-## Filters
 
 Filters can be used to filter a value for iteration or for a condition.
 
 	* isEmpty: Checks if the value is empty. Properties of objects are checked, or length of an array.
 	* sort: Sorts the value. Can be used with reverse and a sorting key for objects in arrays.
 	
-An example of sort.
+An example of sort as followed:
 
 	<div data-each="filters.sort(data.users)">
 	
-Sorting can be reversed.
+Sorting can be reversed as followed:
 
 	<div data-each="filters.sort(data.users, true)">
 	
-Or when provided with an array of objects, based on a key.
+Or when provided with an array of objects, based on a key, as followed:
 
 	<div data-each="filters.sort(data.users, 'name')">
 	
-Or both.
+Or both, as shown below:
 
 	<div data-each="filters.sort(data.users, true, 'name')">
+
+Every filter and handle is accessible in every attribute or variable.
+
+<a name="a16"/>
+## A love story; AJAJ, Express and Gaikan
+
+Gaikan release 1.4 implements the client-side rendering framework; a love story between AJAJ, Express and Gaikan.
+
+<a name="a17"/>
+## Conclusion
+
+Gaikan was written by Roel "Deathspike" van Uden. If you have comments, questions or suggestions I would love to hear from you! To contact me, you can send me an e-mail. Thank you for your interest in the Gaikan HTML template engine for Node and Express.
