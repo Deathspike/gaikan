@@ -328,6 +328,6 @@ Every filter and handle is accessible in every attribute or variable.
 Gaikan release 1.4 implements the client-side rendering framework; a love story between AJAJ, Express and Gaikan.
 
 <a name="a17"/>
-## Conclusion
+## Afterword
 
 Gaikan was written by Roel "Deathspike" van Uden. If you have comments, questions or suggestions I would love to hear from you!
