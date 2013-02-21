@@ -330,4 +330,4 @@ Gaikan release 1.4 implements the client-side rendering framework; a love story 
 <a name="a17"/>
 ## Conclusion
 
-Gaikan was written by Roel "Deathspike" van Uden. If you have comments, questions or suggestions I would love to hear from you! To contact me, you can send me an e-mail. Thank you for your interest in the Gaikan HTML template engine for Node and Express.
+Gaikan was written by Roel "Deathspike" van Uden. If you have comments, questions or suggestions I would love to hear from you!
