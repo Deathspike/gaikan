@@ -1,4 +1,4 @@
 /**
  * Export gaikan.
  */
-module.exports = require('./lib/gaikan');
+module.exports = require('./lib');
