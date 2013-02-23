@@ -24,7 +24,7 @@ Direct usage of the API is not required when using [Express](#a4). The following
 
 	compile(template, compress)
 	    Compiles a template.
-	compileFile(file, directory, cache)
+	compileFile(file, directory, cache, compress)
 	    Compiles a template from file.
 	explain(template, cb)
 	    Explain a template using the compiled function.
