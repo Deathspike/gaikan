@@ -22,10 +22,14 @@ Gaikan is a HTML template engine for Node and Express. It allows compilation of 
 
 Direct usage of the API is not required when using [Express](#a4). The following API is available:
 
-	compile(template)
+	compile(template, compress)
 	    Compiles a template.
 	compileFile(file, directory, cache)
 	    Compiles a template from file.
+	explain(template, cb)
+	    Explain a template using the compiled function.
+	explainFile(file, directory, cb)
+	    Explain a template from file using the compiled function.
 	render(root, inputPartials, template)
 	    Render a template.
 	renderFile(root, inputPartials, file, directory, cache)
@@ -328,6 +332,6 @@ Every filter and handle is accessible in every attribute or variable.
 Gaikan release 1.4 implements the client-side rendering framework; a love story between AJAJ, Express and Gaikan.
 
 <a name="a17"/>
-## Afterword
+## Conclusion
 
-Gaikan was written by Roel "Deathspike" van Uden. If you have comments, questions or suggestions I would love to hear from you!
+Gaikan was written by Roel "Deathspike" van Uden. If you have comments, questions or suggestions I would love to hear from you! To contact me, you can send me an e-mail. Thank you for your interest in the Gaikan HTML template engine for Node and Express.
