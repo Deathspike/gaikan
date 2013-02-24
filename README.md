@@ -77,7 +77,7 @@ A condition is an if-statement on a HTML element using **data-if**. Use the foll
 
 	<div data-if="data.name">Name is set!</div>
 	
-The **data.name** indicates it uses the current data object with the name property. This is the following in JavaScript:
+The **data.name** indicates it uses the current data object with the name property. This is the representation:
 
 	result += '<div>;
 	if (data.name) result += 'Name is set!';
@@ -108,19 +108,17 @@ The special **ins** element is often useful for [includes](#a9).
 <a name="a8"/>
 ### Iterators
 
-An iterator is a for-statement on a HTML element using **data-each**. Use the following template:
+An iterator is a for-statement on a HTML element using **data-in** or **data-for**. Use the following template:
 
-	<ul data-each="data.users">
+	<ul data-in="data.users">
 		<li>Someone is here.</li>
 	</ul>
 	
-This is the following in JavaScript:
+This is the representation:
 
 	result += '<ul>';
 	for (var key in data.users) {
-		if (data.users.hasOwnProperty(key)) {
-			result += '<li>Someone is here.</li>';
-		}
+		result += '<li>Someone is here.</li>';
 	}
 	result += '</ul>';
 
@@ -132,6 +130,20 @@ The result is the following:
 
 	<ul><li>Someone is here.</li></ul>
 
+A for-in statement is not good for performance, so for an array **data-for** is much better:
+
+	<ul data-for="data.users">
+		<li>Someone is here.</li>
+	</ul>
+
+This is the representation:
+
+	result += '<ul>';
+	for (var key = 0, len = data.users.length; key < len; key++) {
+		result += '<li>Someone is here.</li>';
+	}
+	result += '</ul>';
+	
 This becomes powerful when used together with [variables](#a13).
 
 <a name="a9"/>
@@ -198,15 +210,13 @@ Have you been wondering about what **data** really is? It changes depending on t
 		<li data-if="data">Someone is here.</li>
 	</ul>
 
-The condition is using the value from the **data.users** iteration. This is the following in JavaScript:
+The condition is using the value from the **data.users** iteration. This is the representation:
 
 	result += '<ul>';
 	for (var key in data.users) {
-		if (data.users.hasOwnProperty(key)) {
-			(function (parent, data) {
-				result += '<li>Someone is here.</li>';
-			})(data, data.users[key]);
-		}
+		(function (parent, data) {
+			result += '<li>Someone is here.</li>';
+		})(data, data.users[key]);
 	}
 	result += '</ul>';
 
@@ -238,11 +248,9 @@ Variables are defined as either *#{x}* or *!{x}* and are used for content insert
 
 	<b>#{data.name}</b>
 	
-This is the following in JavaScript:
+This is the representation:
 
-	result += '<b>';
-	result += handlers.escape(data.name);
-	result += '</b>';
+	result += '<b>' + handlers.escape(data.name) + '</b>';
 
 Something strange appeared, *handlers.escape*. That is because a **#** variable is **escaped**. Use the following:
 
@@ -250,9 +258,7 @@ Something strange appeared, *handlers.escape*. That is because a **#** variable 
 
 Since is the **unescaped** variable, this is the following in JavaScript:
 
-	result += '<b>';
-	result += data.name;
-	result += '</b>';
+	result += '<b>' + data.name + '</b>';
 
 An unescaped variable does allow HTML and is often undesirable. Variables can also use handlers as followed:
 
@@ -267,7 +273,7 @@ Which would use both handlers. More information about handlers [can be found her
 <a name="a14"/>
 ### Performance
 
-About 95% of performance loss is due to escaping. A solution is to pre-save escape content:
+About 85% of performance loss is due to escaping. A solution is to pre-save escape content:
 
 	var escape = require('gaikan/lib/handlers/escape-handler');
 	var value = escape('<p>This is escaped</p>');
