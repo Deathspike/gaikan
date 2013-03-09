@@ -1,6 +1,6 @@
 {
   "name": "gaikan",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "description": "HTML template engine for Node and Express.",
   "main": "index.js",
   "scripts": {
