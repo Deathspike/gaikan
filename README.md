@@ -271,23 +271,6 @@ This would change the variable to lower-case prior to escaping it. Handlers can 
 Which would use both handlers. More information about handlers [can be found here](#a15).
 
 <a name="a14"/>
-## Code Injection
-
-Code can be injected and evaluated at run-time with **@{x}**, similar to the variable prefix:
-
-	@{data.name}
-	
-A variable would check if this is undefined and then would use a blank string. A more useful example:
-	
-	<option value="1" @{data.score === 1 ? "selected" : ""}>First Option</option>
-	
-Code injection allowed insertation of the 'selected' attribute. Consider this:
-
-	@{console.log(data)}
-	
-Which will evaluate and print to the console. Code injection solves hard-to-solve templating with ease.
-	
-<a name="a15"/>
 ### Performance
 
 About 85% of performance loss is due to escaping. A solution is to pre-save escape content:
@@ -308,6 +291,23 @@ However, it is possible that the variable is to be changed. It can be unescaped 
 	<textarea>!{data.content|unescape}</textarea>
 	
 Forgetting to escape a value makes you vulnerable to XSS. A different approach is presented in [a love story](#a16).
+
+<a name="a15"/>
+## Code Injection
+
+Code can be injected and evaluated at run-time with **@{x}**, similar to the variable prefix:
+
+	@{data.name}
+	
+A variable would check if this is undefined and then would use a blank string. A more useful example:
+	
+	<option value="1" @{data.score === 1 ? "selected" : ""}>First Option</option>
+	
+Code injection allowed insertation of the 'selected' attribute. Consider this:
+
+	@{console.log(data)}
+	
+Which will evaluate and print to the console. Code injection solves hard-to-solve templating with ease.
 
 <a name="a16"/>
 ## Filters and Handlers
