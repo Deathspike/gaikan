@@ -40,7 +40,7 @@ Direct usage of the API is not required when using [Express](#a4). The following
 
 Support for Express has been made as painless as possible. Include the module:
 
-	var gaikan = require('gaikan').
+	var gaikan = require('gaikan');
 
 Configure the view engine:
 
