@@ -1,6 +1,6 @@
 # Gaikan (2.0.0-rc1)
 
-Gaikan is the fastest JavaScript template engine and has been designed to use `data-*` attributes to implement most template features. Due to this design, the templates are completely designer- and tooling friendly. The template engine is compatible with **nodejs**, **expressjs** (a popular web application framework for *nodejs*) and **modern browsers** (IE7+).
+Gaikan is the fastest JavaScript template engine and has been designed to use `data-*` attributes to implement most template features. Due to this design, the templates are completely designer- and tooling friendly. The template engine is compatible with **nodejs**, **expressjs** (a popular web application framework for *nodejs*) and **modern browsers** (IE7+). Test the template engine in the browser with the [interactive Gaikan](http://deathspike.github.io/) (work in progress, IE9+) tool.
 
 ## Table of Contents
 
@@ -136,6 +136,8 @@ Due to this nature of compiling the template to a *JavaScript* function, the tem
 >
 
 	Hello world!
+
+It is recommended to use the [interactive Gaikan](http://deathspike.github.io/) (work in progress, IE9+) tool to play with each example.
 
 ## 4. Variables
 
