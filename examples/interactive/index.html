@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Gaikan</title>
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			width: 100%;
+		}
+		
+		h1 {
+			font-size: 24px;
+		}
+		
+		.container {
+			height: 100%;
+			width: 100%;
+		}
+		
+		.column {
+			float: left;
+			height: 50%;
+			width: 50%;
+		}
+		
+		.editor {
+			border: 1px #000000 solid;
+			height: 40%;
+			width: 50%;
+		}
+	</style>
+</head>
+<body>
+	<div id="test" class="container">
+		<div class="column">
+			<h1>Template</h1>
+			<div class="editor templateEditor"></div>
+		</div>
+		<div class="column">
+			<h1>Output</h1>
+			<div class="editor outputEditor"></div>
+		</div>
+		<div class="column">
+			<h1>Root</h1>
+			<div class="editor rootEditor"></div>
+		</div>
+		<div class="column">
+			<h1>Compiled</h1>
+			<div class="editor compiledEditor"></div>
+		</div>
+	</div>
+	<script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../browser/gaikan-2.0.0-rc1.min.js"  type="text/javascript"></script>
+	<script src="include.js"  type="text/javascript"></script>
+</body>
+</html>
