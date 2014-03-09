@@ -1,360 +1,655 @@
-# Gaikan (1.3)
+# Gaikan (2.0.0-rc1)
 
-Gaikan is a HTML template engine for Node and Express. It allows compilation of HTML to JavaScript and provides a HTML-valid syntax to enable usage of conditions, iterators, includes, partials and variables. The template module was written to have a low entry barrier while accommodating any templating need with the highest achievable performance.
+Gaikan is the fastest JavaScript template engine and has been designed to use `data-*` attributes to implement most template features. Due to this design, the templates are completely designer- and tooling friendly. The template engine is compatible with **nodejs**, **expressjs** (a popular web application framework for *nodejs*) and **modern browsers** (IE7+).
 
-<a name="a1" />
-## Installation
+## Table of Contents
 
-	$ npm install gaikan
+- [1. Quickstart](#1-quickstart)
+- [1.1. NodeJS](#11-nodejs)
+- [1.2. ExpressJS](#12-expressjs)
+- [1.3. Browser](#13-browser)
+- [2. Benchmarks](#2-benchmarks)
+- [2.1. Linux Ubuntu 12.04, NodeJS 0.10.26 (100.000x)](#21-linux-ubuntu-1204-nodejs-01026-100000x)
+- [2.2. Windows 7 x64 SP1, NodeJS 0.10.26 (100.000x)](#22-windows-7-x64-sp1-nodejs-01026-100000x)
+- [3. Introduction](#3-introduction)
+- [4. Variables](#4-variables)
+- [4.1. Escaping](#41-escaping)
+- [4.2. Alterant](#42-alterant)
+- [4.2.1. Break](#421-break)
+- [4.2.2. Decode](#422-decode)
+- [4.2.3. Encode](#423-encode)
+- [4.2.4. Lower](#424-lower)
+- [4.2.5. Title](#425-title)
+- [4.2.6. Upper](#426-upper)
+- [4.2.7. Url](#427-url)
+- [4.3. Set](#43-set)
+- [4.3.1. Empty](#431-empty)
+- [4.3.2. Sort](#432-sort)
+- [5. Attributes](#5-attributes)
+- [5.1. If](#51-if)
+- [5.2. For](#52-for)
+- [5.3. Attribute](#53-attribute)
+- [5.4. Extract](#54-extract)
+- [5.5. Include/Fragment](#55-includefragment)
+- [5.6. Evaluate](#56-evaluate)
+- [6. Tips/Tricks](#6-tipstricks)
+- [6.1. Inline CSS](#61-inline-css)
+- [6.2. If/Else](#62-ifelse)
+- [7. Server API](#7-server-api)
+- [7.1. Options](#71-options)
+- [7.1.1. Caching](#711-caching)
+- [7.1.2. Compression](#712-compression)
+- [7.1.3. Directories](#713-directories)
+- [7.1.4. Extensions](#714-extensions)
+- [7.1.5. Layout](#715-layout)
+- [8. Browser API](#8-browser-api)
+- [8.1. Configuration](#81-configuration)
+- [8.1.1. Compression](#811-compression)
+- [9. Runtime](#9-runtime)
+- [9.1 Alterant](#91-alterant)
+- [9.2 Set](#92-set)
+- [10. Security](#10-security)
+- [11. Planned Future Additions](#11-planned-future-additions)
 
-<a name="a2"/>
-## Features
+## 1. Quickstart
+### 1.1. NodeJS
 
-	- Compiles HTML to JavaScript; low entry barrier.
-	- Complies with W3C standards; designer friendly.
-	- Complies with the Express view system.
-	- Includes/partials; share markup between views.
-	- Iterators/conditions; iterate, filter and write conditions.
-	- Variables/handlers; use (conditional) variables and handlers.
-	
-<a name="a3"/>
-## API
+	npm install gaikan
 
-Direct usage of the API is not required when using [Express](#a4). The following API is available:
-
-	compile(template, compress)
-	    Compiles a template.
-	compileFile(file, directory, cache, compress)
-	    Compiles a template from file.
-	explain(template, cb)
-	    Explain a template using the compiled function.
-	explainFile(file, directory, cb)
-	    Explain a template from file using the compiled function.
-	render(root, inputPartials, template)
-	    Render a template.
-	renderFile(root, inputPartials, file, directory, cache)
-	    Render a template from file.
-
-<a name="a4"/>
-## Express
-
-Support for Express has been made as painless as possible. Include the module:
+### 1.2. ExpressJS
 
 	var gaikan = require('gaikan');
-
-Configure the view engine:
-
 	app.engine('html', gaikan);
-	
-Set the view engine extension:
+	app.set('view engine', '.html');
 
-	app.set('view engine', 'html');
+### 1.3. Browser
 
-<a name="a5"/>
-## Options
+	<script src="gaikan-2.x.x-min.js"  type="text/javascript"></script>
 
-The following options are available:
+## 2. Benchmarks
 
-	cache     : Indicates whether templates compiled from file are cached.
-	compress  : Indicates whether templates compiled from file are cached.
-	directory : The default directory, or directories, used when compiling a template from file.
-	extension : The default file extension used when compiling a template from file.
-	layout    : The layout applied on templates rendered from file.
-	partial   : The name of the partial used when applying the layout.
-	scoped    : Indicates whether Express rendering is scoped to locals and options as partial.
+The template engine is, at the moment, the fastest JavaScript template engine. The benchmark suite has been made available at [template-benchmark](https://github.com/Deathspike/template-benchmark) (forked from an unmaintained template benchmark suite). The benchmark suite was run on an *AMD Phenom(tm) II X4 955 3.2GHZ* processor.
 
-The latter three options are handled in depth at [layouts](#a11) and [scoping](#a12).
+### 2.1. Linux Ubuntu 12.04, NodeJS 0.10.26 (100.000x)
 
-<a name="a6"/>
-## Attributes
+	Gaikan               ( 2090ms) - fastest
+	ECT                  ( 2334ms) - 12% slower
+	Fest                 ( 2791ms) - 34% slower
+	Dust                 ( 3030ms) - 45% slower
+	doT                  ( 3940ms) - 89% slower
+	Hogan.js             ( 3977ms) - 90% slower
+	EJS without `with`   ( 5190ms) - 148% slower
+	Swig                 ( 5258ms) - 152% slower
+	Underscore           ( 6154ms) - 194% slower
+	Handlebars.js        ( 7255ms) - 247% slower
+	Eco                  ( 8315ms) - 298% slower
+	EJS                  ( 9059ms) - 333% slower
+	Jade without `with`  (10973ms) - 425% slower
+	CoffeeKup            (11062ms) - 429% slower
+	Jade                 (27295ms) - 1206% slower
 
-The syntax uses **data-*** attributes for control flow features.
+### 2.2. Windows 7 x64 SP1, NodeJS 0.10.26 (100.000x)
 
-<a name="a7"/>
-### Conditions
+	Gaikan               ( 2147ms) - fastest
+	Fest                 ( 2535ms) - 18% slower
+	doT                  ( 3524ms) - 64% slower
+	Underscore           ( 5108ms) - 138% slower
+	Handlebars.js        ( 5734ms) - 167% slower
+	ECT                  ( 7223ms) - 236% slower
+	EJS without `with`   ( 8732ms) - 307% slower
+	Dust                 ( 9136ms) - 326% slower
+	Hogan.js             ( 9960ms) - 364% slower
+	Swig                 (10240ms) - 377% slower
+	Eco                  (12292ms) - 473% slower
+	Jade without `with`  (13510ms) - 529% slower
+	EJS                  (14917ms) - 595% slower
+	CoffeeKup            (15319ms) - 614% slower
+	Jade                 (34000ms) - 1484% slower
 
-A condition is an if-statement on a HTML element using **data-if**. Use the following template:
+## 3. Introduction
 
-	<div data-if="data.name">Name is set!</div>
-	
-The **data.name** indicates it uses the current data object with the name property. This is the representation:
+It is important to understand a template engine, and this template engine is essentially quite simple. The template engine consumes a template and produces a JavaScript function. That function, representing the template, is then invoked with a **runtime** (`__r`, the helper functions), a **root** object (the user input) and a **fragments** object (`__f`, more on this later). The result of the function is the output. For each example in this documentation, the following object is used as *root*:
 
-	result += '<div>;
-	if (data.name) result += 'Name is set!';
-	result += '</div>';
-	
-When not using Express, this is how it would be rendered:
-
-	gaikan.renderFile({name: 'Deathspike'}, null, 'template');
-
-The second argument is for [partials](#a10), so use null. The result is the following:
-
-	<div>Name is set!</div>
-	
-Conditions are JavaScript, so valid JavaScript is valid here. What if the name is undefined? The result is the following:
-
-	<div></div>
-	
-The empty **div** element is there because it was declared. We can use the special element, **ins**, like this:
-
-	<ins data-if="data.name">Name is set!</ins>
-
-Using the **data-*** attributes, the **ins** element is interpreted as obsolete. This would result in:
-
-	Name is set!
-	
-The special **ins** element is often useful for [includes](#a9).
-
-<a name="a8"/>
-### Iterators
-
-An iterator is a for-statement on a HTML element using **data-in** or **data-for**. Use the following template:
-
-	<ul data-in="data.users">
-		<li>Someone is here.</li>
-	</ul>
-	
-This is the representation:
-
-	result += '<ul>';
-	for (var key in data.users) {
-		result += '<li>Someone is here.</li>';
+	{
+		message: '<b>Hello world!</b>',
+		messageMultipleLines: 'Hello\nworld!',
+        	messagePlain: 'Hello world!',
+		people: [{
+			age: 25,
+			name: 'John'
+		}, {
+			age: 18,
+			name: 'Jane'
+		}]
 	}
-	result += '</ul>';
 
-When not using Express, this is how it would be rendered:
+Due to this nature of compiling the template to a *JavaScript* function, the template features (such as variables and attributes) produce *JavaScript* code and emit each line of code into the function. To demonstrate the behaviour of each feature, the examples in this documentation will show the **template**, the **function** and the **output**. For example:
 
-	gaikan.renderFile({users: ['Deathspike']}, null, 'template');
+	Hello world!
+>
 
-The result is the following:
-
-	<ul><li>Someone is here.</li></ul>
-
-A for-in statement is not good for performance, so for an array **data-for** is much better:
-
-	<ul data-for="data.users">
-		<li>Someone is here.</li>
-	</ul>
-
-This is the representation:
-
-	result += '<ul>';
-	for (var key = 0, len = data.users.length; key < len; key++) {
-		result += '<li>Someone is here.</li>';
+	function anonymous(__r, root, __f) {
+		var __o = '';
+		__o += 'Hello world!';
+		return __o;
 	}
-	result += '</ul>';
-	
-This becomes powerful when used together with [variables](#a13).
+>
 
-<a name="a9"/>
-### Includes
+	Hello world!
 
-Including allows a template to use another template using **data-include**. The following is **hello.html**:
+## 4. Variables
+
+A variable is the only feature that does not use a `data-*` attribute.
+
+	!{root.message}
+>
+
+	function anonymous(__r, root, __f) {
+		var __o = '';
+		__o += (typeof root.message === 'undefined' ? '' : root.message);
+		return __o;
+	}
+>
 
 	<b>Hello world!</b>
+
+### 4.1. Escaping
+
+Escaping a variable prevents XSS and is the recommend variable usage.
+
+	#{root.message}
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += (typeof root.message === 'undefined' ? '' : alterant.encode(root.message));
+		return __o;
+	}
+>
+
+	&#60;b&#62;Hello world!&#60;/b&#62;
+
+### 4.2. Alterant
+
+An alterant modifies a variable. Multiple alterants can be chained.
+
+	#{root.messagePlain|upper,url}
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += (typeof root.message === 'undefined' ? '' : alterant.url(alterant.upper(alterant.encode(root.messagePlain))));
+		return __o;
+	}
+>
+
+	HELLO%20WORLD!
+
+#### 4.2.1. Break
+
+The break alterant replaces new lines with `<br />`.
+
+	#{root.messageMultipleLines|break}
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += (typeof root.messageMultipleLines === 'undefined' ? '' : alterant.break(alterant.encode(root.messageMultipleLines)));
+		return __o;
+	}
+>
+
+	Hello<br />world!
+
+#### 4.2.2. Decode
+
+The decode alterant decodes special HTML characters.
+
+	#{root.message|decode}
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += (typeof root.message === 'undefined' ? '' : alterant.decode(alterant.encode(root.message)));
+		return __o;
+	}
+>
+
+	<b>Hello world!</b>
+
+#### 4.2.3. Encode
+
+The encode alterant encodes spcial HTML characters. The equivalent of a `#` variable statement.
+
+	!{root.message|encode}
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += (typeof root.message === 'undefined' ? '' : alterant.encode(root.message));
+		return __o;
+	}
+>
+
+	&#60;b&#62;Hello world!&#60;/b&#62;
 	
-To demonstrate an inclusion, the following is **layout.html**:
+#### 4.2.4. Lower
 
-	<div class="container" data-include="hello"></div>
+The lower alterant changes the variable to lower case.
+
+	#{root.messagePlain|lower}
+>
 	
-When rendering **layout.html**, the output is as followed:
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += (typeof root.messagePlain === 'undefined' ? '' : alterant.lower(alterant.encode(root.messagePlain)));
+		return __o;
+	}
+>
 
-	<div class="container"><b>Hello world!</b></div>
+	hello world!
 
-The contents of **hello.html** are where they are supposed to be.
+#### 4.2.5. Title
 
-<a name="a10"/>
-### Partials
+The title alterant changes the variable to title case.
 
-Partials can be used to define and insert content using **data-partial**. The following is **hello.html**:
+	#{root.messagePlain|title}
+>
 
-	<b><ins data-partial="content" /></b>
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += (typeof root.messagePlain === 'undefined' ? '' : alterant.title(alterant.encode(root.messagePlain)));
+		return __o;
+	}
+>
+
+	Hello World!
 	
-A placeholder has been defined. When including this file, it can be filled. The following is **layout.html**:
+#### 4.2.6. Upper
 
-	<div class="container" data-include="hello">
-	    <ins data-partial="content">
-	        Hello world!
-	    </ins>
+The upper alterant changes the variable to upper case.
+
+	#{root.messagePlain|upper}
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += (typeof root.messagePlain === 'undefined' ? '' : alterant.upper(alterant.encode(root.messagePlain)));
+		return __o;
+	}
+>
+
+	HELLO WORLD!
+
+#### 4.2.7. Url
+
+The url alterant encodes the variable as an url component.
+
+	#{root.messagePlain|url}
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += (typeof root.messagePlain === 'undefined' ? '' : alterant.url(alterant.encode(root.messagePlain)));
+		return __o;
+	}
+>
+
+	Hello%20world!
+	
+### 4.3. Set
+
+A set operates on an array or object (with properties).
+
+#### 4.3.1. Empty
+
+The empty set checks if a variable is an empty set.
+
+	#{set.empty(root.people)}
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var set = __r.set;
+		var __o = '';
+		__o += (typeof set.empty(root.people) === 'undefined' ? '' : alterant.encode(set.empty(root.people)));
+		return __o;
+	}
+>
+
+	false
+
+#### 4.3.2. Sort
+
+The sort set can sort a variable, optionally by key and reverse.
+
+	<div data-for="person in set.sort(root.people, 'age')">
+	    #{person.name} is #{person.age}
+	</div>
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var set = __r.set;
+		var __o = '';
+		__o += '<div>';
+		var __v0 = set.sort(root.people, 'age');
+		if (__v0) {
+			for (var __k0 = 0; __k0 < __v0.length; __k0 += 1) {
+				var person = __v0[__k0];
+				__o += '\n    ' + (typeof person.name === 'undefined' ? '' : alterant.encode(person.name)) + ' is ' + (typeof person.age === 'undefined' ? '' : alterant.encode(person.age)) + '\n';
+			}
+		}
+		__o += '</div>';
+		return __o;
+	}
+>
+
+	<div>
+	    Jane is 18
+	
+	    John is 25
 	</div>
 
-When rendering **layout.html**, the output is as followed:
 
-	<div class="container"><b>Hello world!</b></div>
+## 5. Attributes
 
-The result is similar, but note that **Hello world!** was defined in **layout.html** instead of **hello.html**.
+The `data-*` attributes emits (or omits) lines of code in the function.
 
-<a name="a11"/>
-### Layout
+### 5.1. If
 
-Includes and partials can be used to create a layout, but options make it easier. The following is **layout.html**:
+The `data-if` attribute emits an if.
 
-	<div class="container" data-partial="content"></div>
+	<div data-if="root.message.length > 2">
+	    #{root.message}
+	</div>
+>
 	
-The partial placeholder is named content, matching *options.partial*. The following is **hello.html**:
-
-	<b>Hello world!</b>
-	
-There are no includes, instead we set *options.layout* to **'layout'**. The output is as followed:
-
-	<div class="container"><b>Hello world!</b></div>
-
-The **layout** options is very powerful, yet uses standard includes/partials to implement the feature.
-
-<a name="a12"/>
-### Scoping
-
-Have you been wondering about what **data** really is? It changes depending on the scope. Use the following:
-
-	<ul data-each="data.users">
-		<li data-if="data">Someone is here.</li>
-	</ul>
-
-The condition is using the value from the **data.users** iteration. This is the representation:
-
-	result += '<ul>';
-	for (var key in data.users) {
-		(function (parent, data) {
-			result += '<li>Someone is here.</li>';
-		})(data, data.users[key]);
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += '<div>';
+		if (root.message.length > 2) {
+			__o += '\n    ' + (typeof root.message === 'undefined' ? '' : alterant.encode(root.message)) + '\n';
+		}
+		__o += '</div>\n';
+		return __o;
 	}
-	result += '</ul>';
+>
 
-The contents of the iteration have been scoped. You can define scoping for **includes** or **partials** as followed:
+	<div>
+	    &#60;b&#62;Hello world!&#60;/b&#62;
+	</div>
 
-	<div data-include="hello|data.contents">
+### 5.2. For
+
+The `data-for` attribute emits a for. Use `in` for arrays, `of` for objects. Key can be omitted.
+
+	<div data-for="value, key in root.people">
+	    #{value.name} at index #{key} is #{value.age}
+	</div>
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += '    <div>';
+		var __v1 = root.people;
+		if (__v1) {
+			for (var key = 0; key < __v1.length; key += 1) {
+				var value = __v1[key];
+				__o += '\r\n\t    ' + (typeof value.name === 'undefined' ? '' : alterant.encode(value.name)) + ' at index ' + (typeof key === 'undefined' ? '' : alterant.encode(key)) + ' is ' + (typeof value.age === 'undefined' ? '' : alterant.encode(value.age)) + '\r\n\t';
+			}
+		}
+		__o += '</div>';
+		return __o;
+	}
+>
+
+	<div>
+	    John at index 0 is 25
 	
-Which can be interpreted as the following JavaScript:
+	    Jane at index 1 is 18
+	</div>
 
-	(function (data) {
-		magicalGaikanInclude(data, 'hello'); // FYI, this function was made up.
-	})(data.contents);
+### 5.3. Attribute
 
-Scoping enables **key** (in iterations), **parent** (in iterations) and **root**. [Express](#a4) can be scoped as well:
+The `data-attribute-*` attribute conditionally adds attributes to an element.
 
-	res.locals.value = 'Something';
-	res.render('template', {value: 42});
+	<option data-attribute-selected="root.message.length > 10"></option>
+>
+
+	function anonymous(__r, root, __f) {
+		var __o = '';
+		__o += '<option';
+		if (root.message.length > 10) {
+			__o += ' selected';
+		}
+		__o += '></option>';
+		return __o;
+	}
+>
+
+	<option selected></option>
+
+### 5.4. Extract
+
+The `data-extract` attribute removes the containing element.
+
+	<div data-extract>
+	    #{root.message}
+	</div>
+>
+
+	function anonymous(__r, root, __f) {
+		var alterant = __r.alterant;
+		var __o = '';
+		__o += '\n    ' + (typeof root.message === 'undefined' ? '' : alterant.encode(root.message)) + '\n';
+		return __o;
+	}
+>
+
+	&#60;b&#62;Hello world!&#60;/b&#62;
+
+### 5.5. Include/Fragment
+
+The `data-include` attribute includes another template. The *root* passed to the included template is by default `root`, but can be changed using `templateName|root`. The `data-fragment` attribute is used to add a placeholder, or fill a placeholder in the included template.
+
+	<div data-include="templateName">
+	    <div data-fragment="content">
+	        Replaces the content fragment placeholder in test.
+	    </div>
+	</div>
+>
+
+	function anonymous(__r, root, __f) {
+		var __o = '';
+		__o += '<div>';
+		var __f0 = {};
+		__f0['content'] = function (__r, root) {
+			var __o = '';
+			__o += '\n        Replaces the content fragment placeholder in test.\n    ';
+			return __o;
+		};
+		__o += __r('templateName', root, __f0);
+		__o += '</div>';
+		return __o;
+	}
+>
+
+	<div>Test template with placeholder in b: <b>
+	        Replaces the content fragment placeholder in test.
+	</b></div>
+
+### 5.6. Evaluate
+
+The `data-evaluate` emits the block as *JavaScript* code.  The equivalent of a `@` variable statement.
+
+	<div data-evaluate>
+	    console.log('Executed when rendering!');
+	</div>
+	@{console.log('Executed when rendering!')}
+>
+
+	function anonymous(__r,root,__f) {
+		var __o = '';
+	 	console.log('Executed when rendering!');
+		__o += '\n';
+		console.log('Executed when rendering!')
+		return __o;
+	}
 	
-The **locals** can be set anywhere, which is what we want for the **layout**. The following is desired:
+## 6. Tips/Tricks
 
-	{value: 'Something', content: {value: 42}}
+These include some common scenarios with simple solutions.
+
+### 6.1. Inline CSS
+
+The `@` variable statement, which evaluates, can act as inline if when in an attribute.
+
+	<div class="@{root ? 'green' : 'red'}"></div>
+>
+
+	function anonymous(__r, root, __f) {
+		var __o = '';
+		__o += '<div class="' + (root ? 'green' : 'red') + '"></div>';
+		return __o;
+	}
+>
+
+	<div class="green"></div>
+
+### 6.2. If/Else
+
+As there is no `data-else` attribute, a test can be stored and used in multiple `data-if` attributes.
+
+	@{var messageValid = root.message.length > 10;}
+	<div data-if="messageValid">Valid!</div>
+	<div data-if="!messageValid">Not valid...</div>
+>
+
+	function anonymous(__r, root, __f) {
+		var __o = '';
+		var messageValid = root.message.length > 10;
+		__o += '\n<div>';
+		if (messageValid) {
+			__o += 'Valid!';
+		}
+		__o += '</div>\n<div>';
+		if (!messageValid) {
+			__o += 'Not valid...';
+		}
+		__o += '</div>';
+		return __o;
+	}
+>
+
+	<div>Valid!</div>
+	<div></div>
+
+## 7. Server API
+
+The server API is available in a **nodejs**/**expressjs** environment.
+
+	gaikan(input, root, fragments = {}, callback = undefined, skipLayout = false)
+>
+	Compiles a function for the input file, invokes it, and returns the output.
+>
+
+	gaikan.compileFromFile(input)
+>
+	Compiles a function for the input file.
+>
+
+	gaikan.compileFromString(input)
+>
+	Compiles a function for the input string.
 	
-And can be achieved by enabling *options.scoped*. Remind yourself to adjust the scoping of the content partial as well.
+### 7.1. Options
 
-<a name="a13"/>
-## Variables
+Available as `gaikan.options`.
 
-Variables are defined as either *#{x}* or *!{x}* and are used for content insertion. Use the following:
+#### 7.1.1. Caching
 
-	<b>#{data.name}</b>
+Enables or disables template caching. When enabled, a compiled template is not compiled again.
+
+	gaikan.options.enableCache = isProduction;
+
+#### 7.1.2. Compression
+
+Enables or disables template compression. When enabled, compiled functions compress output.
+
+	gaikan.options.enableCompression = isProduction;
 	
-This is the representation:
+#### 7.1.3. Directories
 
-	result += '<b>' + handlers.escape(data.name) + '</b>';
+An array with relative directories in which to search templates. Usused for **expressjs**.
 
-Something strange appeared, *handlers.escape*. That is because a **#** variable is **escaped**. Use the following:
-
-	<b>!{data.name}</b>
-
-Since is the **unescaped** variable, this is the following in JavaScript:
-
-	result += '<b>' + data.name + '</b>';
-
-An unescaped variable does allow HTML and is often undesirable. Variables can also use handlers as followed:
-
-	#{data|lower}
+	gaikan.options.directories = ['views', '.'];
 	
-This would change the variable to lower-case prior to escaping it. Handlers can be chained as followed:
+#### 7.1.4. Extensions
 
-	#{data|lower,upper}
+An array with allowed template file extensions. Usused for **expressjs**.
+
+	gaikan.options.extensions = ['gaikan', 'html'];
 	
-Which would use both handlers. More information about handlers [can be found here](#a15).
+#### 7.1.5. Layout
 
-<a name="a14"/>
-### Performance
+Changes output to be the `content` fragment for the layout. Used when `skipLayout` is false.
 
-About 85% of performance loss is due to escaping. A solution is to pre-save escape content:
+	gaikan.options.layout = null;
 
-	var escape = require('gaikan/lib/handlers/escape-handler');
-	var value = escape('<p>This is escaped</p>');
+## 8. Browser API
+
+The browser API is available in a **modern browser** environment.
+
+	gaikan(input, root, fragments = {})
+>
+	Not yet implemented.
+>
+
+	gaikan.compileFromString(input)
+>
+	Compiles a function for the input string.
 	
-This value would result into the following escaped text for storage purposes:
+### 8.1. Configuration
 
-	&#60;p&#62;This is escaped&#60;/p&#62;
+Available as `gaikan.options`.
 
-This improves performance as escaping is done once, opposed to every render. The following can be used now:
+#### 8.1.1. Compression
 
-	<b>!{data.content}</b>
+Enables or disables template compression. When enabled, compiled functions compress output.
 
-However, it is possible that the variable is to be changed. It can be unescaped using a handler as followed:
+	gaikan.options.enableCompression = false;
 
-	<textarea>!{data.content|unescape}</textarea>
-	
-Forgetting to escape a value makes you vulnerable to XSS. A different approach is presented in [a love story](#a16).
+## 9. Runtime
 
-<a name="a15"/>
-## Code Injection
+In both the **nodejs**/**expressjs** and **modern browser** environment, the template engine serves as runtime.
 
-Code can be injected and evaluated at run-time with **@{x}**, similar to the variable prefix:
+### 9.1 Alterant
 
-	@{data.name}
-	
-A variable would check if this is undefined and then would use a blank string. A more useful example:
-	
-	<option value="1" @{data.score === 1 ? "selected" : ""}>First Option</option>
-	
-Code injection allowed insertation of the 'selected' attribute. Consider this:
+Alterants are available as `gaikan.alterant`. Adding functions makes them available in each template.
 
-	@{console.log(data)}
-	
-Which will evaluate and print to the console. Code injection solves hard-to-solve templating with ease.
+### 9.2 Set
 
-<a name="a16"/>
-## Filters and Handlers
+Alterants are available as `gaikan.set`. Adding functions makes them available in each template.
 
-Handlers have been explained in [variables](#a13), however the following is also possible:
+## 10. Security
 
-	<div data-if="handlers.upper(data.value)[0]"></div>
+Escape variables to prevent XSS, and do not allow user content as template.
 
-This is because each handler is a field in the handlers object. The following handlers are available:
+## 11. Planned Future Additions
 
-	* escape: Escapes html to avoid html injection. Default behaviour when using #{var} instead of !{var}.
-	* lower: Changes the value to lower case.
-	* nl2br: Changes new lines to break elements. Great when using !{var|nl2br,escape} for text inputs.
-	* title: Changes the value to title case.
-	* unescape: Unescapes escaped html.
-	* upper: Changes the value to upper case.
-	* url: Escapes the value for use in an url.
-
-Filters can be used to filter a value for iteration or for a condition.
-
-	* isEmpty: Checks if the value is empty. Properties of objects are checked, or length of an array.
-	* sort: Sorts the value. Can be used with reverse and a sorting key for objects in arrays.
-	
-An example of sort as followed:
-
-	<div data-each="filters.sort(data.users)">
-	
-Sorting can be reversed as followed:
-
-	<div data-each="filters.sort(data.users, true)">
-	
-Or when provided with an array of objects, based on a key, as followed:
-
-	<div data-each="filters.sort(data.users, 'name')">
-	
-Or both, as shown below:
-
-	<div data-each="filters.sort(data.users, true, 'name')">
-
-Every filter and handle is accessible in every attribute or variable.
-
-<a name="a17"/>
-## A love story; AJAJ, Express and Gaikan
-
-Gaikan release 1.4 implements the client-side rendering framework; a love story between AJAJ, Express and Gaikan.
-
-<a name="a17"/>
-## Conclusion
-
-Gaikan was written by Roel "Deathspike" van Uden. If you have comments, questions or suggestions I would love to hear from you! To contact me, you can send me an e-mail. Thank you for your interest in the Gaikan HTML template engine for Node and Express.
+	* Improve interactive testing environment (examples/interactive).
+	* Implement client-side template cache.
+	* Implement expressjs hook to run rendering on client.
+	* Implement designer prototyping tooling with auto-refresh and data stubbing.
