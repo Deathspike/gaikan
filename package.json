@@ -1,7 +1,7 @@
 {
   "name": "gaikan",
-  "version": "2.0.0-rc1",
-  "description": "HTML template engine for Node and Express.",
+  "version": "2.0.0-rc2",
+  "description": "The fastest JavaScript template engine.",
   "keywords": [
     "express",
     "gaikan",
