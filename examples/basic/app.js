@@ -1,10 +1,8 @@
-// Enable restricted mode.
+/*jslint node: true*/
 'use strict';
-
-// Declare the modules.
+// Initialize the gaikan module.
 var gaikan = require('../../'); // require('gaikan');
-
-// Run the template and show the result.
+// Run the template.
 console.log(gaikan('test', {
 	children: [{
 		name: 'Henk',
