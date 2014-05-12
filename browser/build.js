@@ -1,4 +1,4 @@
-// Enable restricted mode.
+/*jslint node: true*/
 'use strict';
 // Include the browserbuild module.
 var browserbuild = require('browserbuild');
@@ -29,10 +29,10 @@ browserbuild.render(['../lib'], {
 		uglifyjs.minify(src, {fromString: true}).code,
 		// ... with the callback.
 		function (err) {
-		// Check if an error has occurred.
-		if (err) {
-			// Throw the error.
-			throw err;
-		}
-	});
+			// Check if an error has occurred.
+			if (err) {
+				// Throw the error.
+				throw err;
+			}
+		});
 });
