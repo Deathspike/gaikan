@@ -1,6 +1,6 @@
 {
   "name": "gaikan",
-  "version": "2.0.0-rc2",
+  "version": "2.0.0",
   "description": "The fastest JavaScript template engine.",
   "keywords": [
     "express",
@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "browserbuild": "0.7.x",
-	"express": "3.5.x",
+	"express": "4.2.x",
     "uglify-js": "2.4.x"
   }
 }
