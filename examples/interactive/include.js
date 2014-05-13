@@ -1,27 +1,36 @@
 
 /*jslint browser: true, nomen: true, evil: true*/
-/*global ace, gaikan: false*/
+/*global ace, gaikan*/
 (function () {
+	// Enable restricted mode.
 	'use strict';
 
 	function InteractiveGaikan(container) {
+		// Set the container.
 		this._container = container;
+		// Set each editor ...
 		this._editors = {
+			// ... with the template editor ...
 			template: this.create('templateEditor', 'html'),
+			// ... with the root editor ...
 			root: this.create('rootEditor', 'json'),
+			// ... with the compiled function editor ...
 			compiled: this.create('compiledEditor', 'javascript', true),
+			// ... with the output editor.
 			output: this.create('outputEditor', 'html', true)
 		};
+		// Update each interactive editor.
 		this.update();
 	}
 
-	InteractiveGaikan.prototype.create = function (className, mode, isReadOnly) {
-		var elements = document.getElementsByClassName(className),
+	InteractiveGaikan.prototype.create = function (id, mode, isReadOnly) {
+		var element = document.getElementById(id),
 			editor;
-		if (elements.length) {
-			editor = ace.edit(elements[0]);
+		if (element) {
+			editor = ace.edit(element);
 			editor.setBehavioursEnabled(false);
 			editor.getSession().setMode('ace/mode/' + mode);
+			// Set the gutter to be disabled.
 			editor.renderer.setShowGutter(false);
 			if (isReadOnly) {
 				editor.setReadOnly(true);
@@ -58,14 +67,14 @@
 		// parse json
 		try {
 			if (this._editors.root && this._editors.root.getValue()) {
-				// Too bad correct objects can't be JSON.parse'd.
+				// Too bad correct JS objects can't be JSON.parse'd.
 				eval('root = ' + this._editors.root.getValue() + ';');
 			} else {
 				root = undefined;
 			}
-		} catch (err1) {
+		} catch (jsonError) {
 			if (this._editors.output) {
-				this._editors.output.setValue('ERROR' + err1, -1);
+				this._editors.output.setValue('ERROR' + jsonError, -1);
 			}
 			return;
 		}
@@ -76,9 +85,9 @@
 			if (this._editors.output) {
 				this._editors.output.setValue(output, -1);
 			}
-		} catch (err2) {
+		} catch (outputError) {
 			if (this._editors.output) {
-				this._editors.output.setValue('ERROR' + err2, -1);
+				this._editors.output.setValue('ERROR' + outputError, -1);
 			}
 		}
 	};
