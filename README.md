@@ -597,6 +597,10 @@ Enables or disables template compression. When enabled, compiled functions compr
 An array with relative directories in which to search templates. Usused for **expressjs**.
 
 	gaikan.options.directories = ['views', '.'];
+
+Templates resolve from the root directory, which defaults to the main script directory.
+
+	gaikan.options.rootDir = path.dirname(require.main.filename);
 	
 #### 7.1.4. Extensions
 
